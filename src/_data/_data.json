@@ -1,0 +1,19 @@
+{
+	"global": {
+		"site_title": "Html Website",
+		"language": "en",
+		"home_link": "/"
+	},
+  "nav": [
+    {
+      "slug": "",
+      "title": "home"
+    }
+  ],
+  "home": {
+    "description": "Just another html website",
+    "keywords": "static site, html, css, javascript, wow",
+    "title": "💻 Just another html website",
+    "body_class": "home"
+  }
+}
