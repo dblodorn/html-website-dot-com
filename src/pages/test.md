@@ -1,10 +1,6 @@
 ---
-template: page.pug
+template: template.pug
 title: Test
-photos:
-  - a
-  - b
-  - c
-  - d
 ---
-This is a test.  
+
+## This is a test.  

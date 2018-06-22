@@ -9,7 +9,6 @@ var autoprefixer = require('gulp-autoprefixer');
 var minifycss  = require('gulp-minify-css');
 var source = require('vinyl-source-stream');
 var buffer = require('vinyl-buffer');
-var util = require('gulp-util');
 var runSequence = require('run-sequence');
 var uglify = require('gulp-uglify');
 var fs = require('fs');
@@ -17,40 +16,27 @@ var pug = require('gulp-pug');
 var wrap = require("gulp-wrap");
 var plumber = require('gulp-plumber');
 var rename = require('gulp-rename');
-const markdownToJSON = require('gulp-markdown-to-json');
-const marked = require('marked');
-
+const md = require('gulp-markdown-to-json');
+const marked = require('remark');
 var data = require('gulp-data');
 var sync = require('gulp-npm-script-sync');
 var webserver = require('gulp-webserver');
+var path = require("path");
 
 var dist = './dist/'
 
-//
-marked.setOptions({
-  pedantic: true,
-  smartypants: true
-});
-
 gulp.task('docs', function() {
-  gulp.src('./src/pages/*.md')
-    .pipe(plumber())
-    .pipe(markdownToJSON(marked))
-    .pipe(data(function(file) {
-      return JSON.parse(
-        fs.readFileSync('./src/_data/_data.json')
-      );
-    }))
+  return gulp.src('./src/pages/*.md')
+    .pipe(md(marked))
     .pipe(wrap(function(data) {
-      var template = './src/pug/templates/' + data.contents.template;
+      console.log(data);
+      var template = __dirname + '/src/pug/templates/' + data.contents.template;
       return fs.readFileSync(template).toString();
     }, {}, {
       engine: 'pug'
     }))
-    .pipe(rename({
-      extname:'.html'
-    }))
-    .pipe(gulp.dest(dist));
+    .pipe(rename({extname:'.html'}))
+    .pipe(gulp.dest('./dist/'));
 });
 
 // PUG

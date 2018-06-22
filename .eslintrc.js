@@ -10,10 +10,7 @@ module.exports = {
     modules: true
   },
   'rules': {
-    'quotes': [2, 'single'],
-    // 'strict': [2, 'never'],
     'comma-dangle': ['error', 'never'],
-    // 'semi': [2, 'never'],
     'keyword-spacing': ['error', { 'before': true }]
   }
 }
