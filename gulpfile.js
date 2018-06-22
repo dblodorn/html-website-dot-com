@@ -14,11 +14,58 @@ var runSequence = require('run-sequence');
 var uglify = require('gulp-uglify');
 var fs = require('fs');
 var pug = require('gulp-pug');
+var wrap = require("gulp-wrap");
+var plumber = require('gulp-plumber');
+var rename = require('gulp-rename');
+const markdownToJSON = require('gulp-markdown-to-json');
+const marked = require('marked');
+
 var data = require('gulp-data');
 var sync = require('gulp-npm-script-sync');
 var webserver = require('gulp-webserver');
 
 var dist = './dist/'
+
+//
+marked.setOptions({
+  pedantic: true,
+  smartypants: true
+});
+
+gulp.task('docs', function() {
+  gulp.src('./src/pages/*.md')
+    .pipe(plumber())
+    .pipe(markdownToJSON(marked))
+    .pipe(data(function(file) {
+      return JSON.parse(
+        fs.readFileSync('./src/_data/_data.json')
+      );
+    }))
+    .pipe(wrap(function(data) {
+      var template = './src/pug/templates/' + data.contents.template;
+      return fs.readFileSync(template).toString();
+    }, {}, {
+      engine: 'pug'
+    }))
+    .pipe(rename({
+      extname:'.html'
+    }))
+    .pipe(gulp.dest(dist));
+});
+
+// PUG
+gulp.task('pug', function buildHTML() {
+  return gulp.src('./src/pug/*.pug')
+  .pipe(data(function(file) {
+    return JSON.parse(
+      fs.readFileSync('./src/_data/_data.json')
+    );
+  }))
+  .pipe(pug({
+    pretty: true
+  }))
+  .pipe(gulp.dest(dist));
+});
 
 // Bundle Sass
 gulp.task('sass-dev', function() {
@@ -70,20 +117,6 @@ gulp.task('js-prod', function() {
   .pipe(buffer())
   .pipe(uglify())
   .pipe(gulp.dest(dist + 'js/'));
-});
-
-// PUG
-gulp.task('pug', function buildHTML() {
-  return gulp.src('./src/pug/*.pug')
-  .pipe(data(function(file) {
-    return JSON.parse(
-      fs.readFileSync('./src/_data/_data.json')
-    );
-  }))
-  .pipe(pug({
-    pretty: true
-  }))
-  .pipe(gulp.dest(dist));
 });
 
 // Serve
